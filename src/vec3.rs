@@ -7,16 +7,16 @@ pub struct Vec3 {
 }
 
 impl Vec3 {
-    pub fn from(vec: [f64; 3]) -> Self {
+    pub const fn from(vec: [f64; 3]) -> Self {
         Vec3 { coor: vec }
     }
 
-    pub fn new(x: f64, y: f64, z: f64) -> Self {
+    pub const fn new(x: f64, y: f64, z: f64) -> Self {
         Vec3::from([x, y, z])
     }
 
-    pub fn zero() -> Self {
-        Self::new(0.0, 0.0, 0.0)
+    pub const fn zero() -> Self {
+        Vec3::new(0.0, 0.0, 0.0)
     }
 
     pub fn length_squared(&self) -> f64 {
@@ -27,15 +27,15 @@ impl Vec3 {
         self.length_squared().sqrt()
     }
 
-    pub fn x(&self) -> f64 {
+    pub const fn x(&self) -> f64 {
         self.coor[0]
     }
 
-    pub fn y(&self) -> f64 {
+    pub const fn y(&self) -> f64 {
         self.coor[1]
     }
 
-    pub fn z(&self) -> f64 {
+    pub const fn z(&self) -> f64 {
         self.coor[2]
     }
 
