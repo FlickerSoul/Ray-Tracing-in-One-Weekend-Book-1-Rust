@@ -4,11 +4,12 @@ use crate::vec3::{Point3, Vec3};
 
 pub trait Hittable {
     fn is_hit(&self, ray: &Ray) -> bool;
+    fn hit_ray_pos(&self, ray: &Ray) -> Option<f64>;
 }
 
 pub struct Sphere {
-    center: Point3,
-    radius: f64,
+    pub center: Point3,
+    pub radius: f64,
 }
 
 impl Sphere {
@@ -30,5 +31,19 @@ impl Hittable for Sphere {
         } else {
             return false;
         }
+    }
+
+    fn hit_ray_pos(&self, ray: &Ray) -> Option<f64> {
+        let c = (ray.origin - self.center).length_squared() - self.radius * self.radius;
+        let b = 2.0 * ray.direction.dot(ray.origin - self.center);
+        let a = ray.direction.length_squared();
+
+        let inner = b * b - 4.0 * a * c;
+
+        return if inner < 0.0 {
+            None
+        } else {
+            Some(-b - inner.sqrt() / (2.0 * a))
+        };
     }
 }

@@ -39,8 +39,17 @@ fn main() {
                 LOWER_LEFT_CORNER + u * HORIZONTAL + v * VERTICAL - ORIGIN,
             );
 
-            let color = if sphere.is_hit(&ray) {
-                vec3::Color::new(1.0, 0.0, 0.0)
+            let color = if let Some(t) = sphere.hit_ray_pos(&ray) {
+                let point_on_sphere = ray.at(t);
+                let mut normal = point_on_sphere - sphere.center;
+                let offset = normal.x().min(normal.y().min(normal.z()));
+
+                if offset < 0.0 {
+                    normal = normal + vec3::Vec3::new(-offset, -offset, -offset)
+                }
+                normal = normal.unit();
+
+                normal / normal.x().max(normal.y().max(normal.z()))
             } else {
                 ray::ray_color(&ray)
             };
