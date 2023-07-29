@@ -1,10 +1,13 @@
 mod color;
 mod math_traits;
+mod objects;
 mod ray;
 mod vec3;
 
+use objects::Hittable;
+
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const IMAGE_WIDTH: u32 = 256;
+const IMAGE_WIDTH: u32 = 512;
 const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
 
 const VIEWPORT_HEIGHT: f64 = 2.0;
@@ -23,6 +26,8 @@ const LOWER_LEFT_CORNER: vec3::Point3 = vec3::Point3::new(
 fn main() {
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
 
+    let sphere = objects::Sphere::new(vec3::Point3::new(0.0, 0.0, -1.0), 0.5);
+
     for j in 0..IMAGE_HEIGHT {
         eprintln!("Outputing {}/{}", j + 1, IMAGE_HEIGHT);
         for i in 0..IMAGE_WIDTH {
@@ -34,9 +39,13 @@ fn main() {
                 LOWER_LEFT_CORNER + u * HORIZONTAL + v * VERTICAL - ORIGIN,
             );
 
-            let color = ray::ray_color(&ray);
+            let color = if sphere.is_hit(&ray) {
+                vec3::Color::new(1.0, 0.0, 0.0)
+            } else {
+                ray::ray_color(&ray)
+            };
 
-            color::write_color(&color, &mut std::io::stdout())
+            color::write_color(&color, &mut std::io::stdout());
         }
     }
 }
