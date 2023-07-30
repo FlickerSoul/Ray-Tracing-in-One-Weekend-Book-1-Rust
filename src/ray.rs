@@ -28,13 +28,55 @@ pub fn background(ray: &Ray) -> vec3::Color {
 
 #[inline(always)]
 pub fn ray_color(ray: &Ray, world: &Vec<Box<dyn Hittable>>, iter: u32) -> vec3::Color {
+    ray_color_hemisphere(ray, world, iter)
+}
+
+#[allow(dead_code)]
+#[inline(always)]
+pub fn ray_color_unit_vector(ray: &Ray, world: &Vec<Box<dyn Hittable>>, iter: u32) -> vec3::Color {
+    if iter <= 0 {
+        return vec3::Color::zero();
+    }
+
+    if let Some(record) = world.hit(&ray, 0.001, f64::INFINITY) {
+        let target = record.hit_point + record.normal + vec3::Vec3::random_unit_vector();
+        0.5 * ray_color_unit_vector(
+            &Ray::new(record.hit_point, target - record.hit_point),
+            world,
+            iter - 1,
+        )
+    } else {
+        background(&ray)
+    }
+}
+#[inline(always)]
+pub fn ray_color_hemisphere(ray: &Ray, world: &Vec<Box<dyn Hittable>>, iter: u32) -> vec3::Color {
+    if iter <= 0 {
+        return vec3::Color::zero();
+    }
+
+    if let Some(record) = world.hit(&ray, 0.001, f64::INFINITY) {
+        let target = record.hit_point + vec3::Vec3::random_in_hemisphere(&record.normal);
+        0.5 * ray_color_hemisphere(
+            &Ray::new(record.hit_point, target - record.hit_point),
+            world,
+            iter - 1,
+        )
+    } else {
+        background(&ray)
+    }
+}
+
+#[allow(dead_code)]
+#[inline(always)]
+pub fn ray_color_unit_sphere(ray: &Ray, world: &Vec<Box<dyn Hittable>>, iter: u32) -> vec3::Color {
     if iter <= 0 {
         return vec3::Color::zero();
     }
 
     if let Some(record) = world.hit(&ray, 0.001, f64::INFINITY) {
         let target = record.hit_point + record.normal + vec3::Vec3::random_in_unit_sphere();
-        0.5 * ray_color(
+        0.5 * ray_color_unit_sphere(
             &Ray::new(record.hit_point, target - record.hit_point),
             world,
             iter - 1,

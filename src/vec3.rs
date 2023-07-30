@@ -39,6 +39,20 @@ impl Vec3 {
         }
     }
 
+    pub fn random_unit_vector() -> Self {
+        Self::random_in_unit_sphere().unit()
+    }
+
+    pub fn random_in_hemisphere(normal: &Vec3) -> Self {
+        let vec = Self::random_in_unit_sphere();
+
+        if vec.dot(normal) > 0.0 {
+            vec
+        } else {
+            -vec
+        }
+    }
+
     pub const fn zero() -> Self {
         Vec3::new(0.0, 0.0, 0.0)
     }
