@@ -2,9 +2,9 @@ mod color;
 mod math_traits;
 mod objects;
 mod ray;
+mod utils;
 mod vec3;
 
-use math_traits::InnerProduct;
 use objects::Hittable;
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
@@ -28,9 +28,15 @@ fn main() {
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
 
     let sphere = objects::Sphere::new(vec3::Point3::new(0.0, 0.0, -1.0), 0.5);
+    let ground = objects::Sphere::new(vec3::Vec3::new(0.0, -100.5, -1.0), 100.0);
 
-    for j in 0..IMAGE_HEIGHT {
-        eprintln!("Outputing {}/{}", j + 1, IMAGE_HEIGHT);
+    let mut world: Vec<Box<dyn Hittable>> = vec![];
+
+    world.push(Box::new(sphere));
+    world.push(Box::new(ground));
+
+    for j in (0..IMAGE_HEIGHT).rev() {
+        eprintln!("Output remaining {}", j + 1);
         for i in 0..IMAGE_WIDTH {
             let u = i as f64 / (IMAGE_WIDTH - 1) as f64;
             let v = j as f64 / (IMAGE_HEIGHT - 1) as f64;
@@ -40,7 +46,7 @@ fn main() {
                 LOWER_LEFT_CORNER + u * HORIZONTAL + v * VERTICAL - ORIGIN,
             );
 
-            let color = if let Some(record) = sphere.hit(&ray, 0.0, 3.0) {
+            let color = if let Some(record) = world.hit(&ray, 0.0, f64::INFINITY) {
                 let normal = if record.front_face {
                     record.normal
                 } else {

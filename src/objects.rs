@@ -69,3 +69,11 @@ impl Hittable for Sphere {
         return Some(HitRecord::new(t, hit_point, normal, front_face));
     }
 }
+
+impl Hittable for Vec<Box<dyn Hittable>> {
+    fn hit(&self, ray: &Ray, min: f64, max: f64) -> Option<HitRecord> {
+        self.iter()
+            .filter_map(|e| e.hit(ray, min, max))
+            .min_by(|a, b| a.t.total_cmp(&b.t))
+    }
+}
