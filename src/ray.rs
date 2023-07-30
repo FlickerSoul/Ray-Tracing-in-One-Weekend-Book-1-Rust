@@ -29,13 +29,7 @@ pub fn background(ray: &Ray) -> vec3::Color {
 #[inline(always)]
 pub fn ray_color(ray: &Ray, world: &Vec<Box<dyn Hittable>>) -> vec3::Color {
     if let Some(record) = world.hit(&ray, 0.0, f64::INFINITY) {
-        let normal = if record.front_face {
-            record.normal
-        } else {
-            -record.normal
-        };
-
-        0.5 * (normal + vec3::Vec3::new(1.0, 1.0, 1.0))
+        0.5 * (record.normal + vec3::Vec3::new(1.0, 1.0, 1.0))
     } else {
         background(&ray)
     }

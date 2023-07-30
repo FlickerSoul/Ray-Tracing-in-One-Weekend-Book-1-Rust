@@ -60,7 +60,7 @@ impl Hittable for Sphere {
 
         let out_normal = (hit_point - self.center).unit();
 
-        let (normal, front_face) = if out_normal.dot(&ray.direction) < 0.0 {
+        let (normal, front_face) = if out_normal.dot(&ray.direction) > 0.0 {
             (-out_normal, false)
         } else {
             (out_normal, true)
