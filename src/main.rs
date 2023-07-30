@@ -40,9 +40,12 @@ fn main() {
                 LOWER_LEFT_CORNER + u * HORIZONTAL + v * VERTICAL - ORIGIN,
             );
 
-            let color = if let Some(t) = sphere.hit_ray_pos(&ray) {
-                let point_on_sphere = ray.at(t);
-                let normal = (point_on_sphere - sphere.center).unit();
+            let color = if let Some(record) = sphere.hit(&ray, 0.0, 3.0) {
+                let normal = if record.front_face {
+                    record.normal
+                } else {
+                    -record.normal
+                };
 
                 0.5 * (normal + vec3::Vec3::new(1.0, 1.0, 1.0))
             } else {

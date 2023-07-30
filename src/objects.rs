@@ -21,8 +21,6 @@ impl HitRecord {
 }
 
 pub trait Hittable {
-    fn is_hit(&self, ray: &Ray) -> bool;
-    fn hit_ray_pos(&self, ray: &Ray) -> Option<f64>;
     fn hit(&self, ray: &Ray, min: f64, max: f64) -> Option<HitRecord>;
 }
 
@@ -38,50 +36,21 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
-    fn is_hit(&self, ray: &Ray) -> bool {
-        let con: Vec3 = self.center - ray.origin;
-        let touch = con.dot(&ray.direction.unit()) * ray.direction.unit();
-        let dis = (con - touch).length();
-
-        if dis < 0.0 {
-            return false;
-        } else if dis <= self.radius {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    fn hit_ray_pos(&self, ray: &Ray) -> Option<f64> {
-        let oc = ray.origin - self.center;
-        let c = oc.length_squared() - self.radius * self.radius;
-        let b = 2.0 * ray.direction.dot(&oc);
-        let a = ray.direction.length_squared();
-
-        let inner = b * b - 4.0 * a * c;
-
-        return if inner < 0.0 {
-            None
-        } else {
-            Some((-b - inner.sqrt()) / (2.0 * a))
-        };
-    }
-
     fn hit(&self, ray: &Ray, min: f64, max: f64) -> Option<HitRecord> {
         let oc = ray.origin - self.center;
         let c = oc.length_squared() - self.radius * self.radius;
-        let b = 2.0 * ray.direction.dot(&oc);
+        let half_b = ray.direction.dot(&oc);
         let a = ray.direction.length_squared();
 
-        let inner = b * b - 4.0 * a * c;
+        let inner = half_b * half_b - a * c;
 
         if inner < 0.0 {
             return None;
         }
 
-        let mut t = (-b - inner.sqrt()) / (2.0 * a);
+        let mut t = (-half_b - inner.sqrt()) / a;
         if t < min || t > max {
-            t = (-b + inner.sqrt()) / (2.0 * a);
+            t = (-half_b + inner.sqrt()) / a;
             if t < min || t > max {
                 return None;
             }
