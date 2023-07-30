@@ -24,8 +24,8 @@ fn main() {
 
     let ground_mat = Rc::new(material::Lambertian::new(vec3::Color::new(0.8, 0.8, 0.0)));
     let center_mat = Rc::new(material::Lambertian::new(vec3::Color::new(0.7, 0.3, 0.3)));
-    let left_mat = Rc::new(material::Metal::new(vec3::Color::new(0.8, 0.8, 0.8)));
-    let right_mat = Rc::new(material::Metal::new(vec3::Color::new(0.8, 0.6, 0.2)));
+    let left_mat = Rc::new(material::Metal::new(vec3::Color::new(0.8, 0.8, 0.8), 0.3));
+    let right_mat = Rc::new(material::Metal::new(vec3::Color::new(0.8, 0.6, 0.2), 1.0));
 
     let ground = objects::Sphere::new(
         vec3::Vec3::new(0.0, -100.5, -1.0),
