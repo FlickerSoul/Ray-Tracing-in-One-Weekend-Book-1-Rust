@@ -8,9 +8,9 @@ pub fn write_color<T: Write>(io: &mut T, color: &Color, samples_per_pixel: u32) 
     let _ = io.write(
         format!(
             "{} {} {}\n",
-            (255.99 * color.x()).floor() as u32,
-            (255.99 * color.y()).floor() as u32,
-            (255.99 * color.z()).floor() as u32
+            utils::clamp_color(color.x(), 0.0, 0.999),
+            utils::clamp_color(color.y(), 0.0, 0.999),
+            utils::clamp_color(color.z(), 0.0, 0.999),
         )
         .as_bytes(),
     );

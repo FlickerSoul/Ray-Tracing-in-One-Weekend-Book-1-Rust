@@ -29,6 +29,7 @@ impl Camera {
         }
     }
 
+    #[inline(always)]
     pub fn get_ray(&self, u: f64, v: f64) -> Ray {
         Ray::new(
             self.origin,

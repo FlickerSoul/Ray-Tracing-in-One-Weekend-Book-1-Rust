@@ -17,6 +17,7 @@ impl Ray {
     }
 }
 
+#[inline(always)]
 pub fn background(ray: &Ray) -> vec3::Color {
     let unit_direction = ray.direction.unit();
 
@@ -25,6 +26,7 @@ pub fn background(ray: &Ray) -> vec3::Color {
     (1.0 - t) * vec3::Color::new(1.0, 1.0, 1.0) + t * vec3::Color::new(0.5, 0.7, 1.0)
 }
 
+#[inline(always)]
 pub fn ray_color(ray: &Ray, world: &Vec<Box<dyn Hittable>>) -> vec3::Color {
     if let Some(record) = world.hit(&ray, 0.0, f64::INFINITY) {
         let normal = if record.front_face {
