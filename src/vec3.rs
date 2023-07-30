@@ -95,7 +95,7 @@ impl ops::Index<usize> for Vec3 {
 impl math_traits::CrossProduct for Vec3 {
     type Output = Vec3;
 
-    fn cross(self, _rhs: Vec3) -> Vec3 {
+    fn cross(&self, _rhs: &Vec3) -> Vec3 {
         Vec3::new(
             self.y() * _rhs.z() - self.z() * _rhs.y(),
             self.z() * _rhs.x() - self.x() * _rhs.z(),
@@ -107,12 +107,12 @@ impl math_traits::CrossProduct for Vec3 {
 impl math_traits::InnerProduct for Vec3 {
     type Output = f64;
 
-    fn dot(self, _rhs: Vec3) -> f64 {
+    fn dot(&self, _rhs: &Vec3) -> f64 {
         self.x() * _rhs.x() + self.y() * _rhs.y() + self.z() * _rhs.z()
     }
 
     fn length_squared(&self) -> f64 {
-        self.x() * self.x() + self.y() * self.y() + self.z() * self.z()
+        self.dot(self)
     }
 
     fn length(&self) -> f64 {
