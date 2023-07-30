@@ -92,6 +92,22 @@ impl ops::Index<usize> for Vec3 {
     }
 }
 
+impl ops::AddAssign<Vec3> for Vec3 {
+    fn add_assign(&mut self, _rhs: Vec3) {
+        self.coor[0] += _rhs.x();
+        self.coor[1] += _rhs.y();
+        self.coor[2] += _rhs.z();
+    }
+}
+
+impl ops::AddAssign<&Vec3> for Vec3 {
+    fn add_assign(&mut self, _rhs: &Vec3) {
+        self.coor[0] += _rhs.x();
+        self.coor[1] += _rhs.y();
+        self.coor[2] += _rhs.z();
+    }
+}
+
 impl math_traits::CrossProduct for Vec3 {
     type Output = Vec3;
 

@@ -29,23 +29,17 @@ fn main() {
     for j in (0..IMAGE_HEIGHT).rev() {
         eprintln!("Output remaining {}", j + 1);
         for i in 0..IMAGE_WIDTH {
-            let u = i as f64 / (IMAGE_WIDTH - 1) as f64;
-            let v = j as f64 / (IMAGE_HEIGHT - 1) as f64;
+            let mut color = vec3::Color::zero();
 
-            let ray = camera.get_ray(u, v);
-            let color = if let Some(record) = world.hit(&ray, 0.0, f64::INFINITY) {
-                let normal = if record.front_face {
-                    record.normal
-                } else {
-                    -record.normal
-                };
+            for _ in 0..SAMPLES_PER_PIXEL {
+                let u = (i as f64 + utils::random()) / (IMAGE_WIDTH - 1) as f64;
+                let v = (j as f64 + utils::random()) / (IMAGE_HEIGHT - 1) as f64;
+                let ray = camera.get_ray(u, v);
 
-                0.5 * (normal + vec3::Vec3::new(1.0, 1.0, 1.0))
-            } else {
-                ray::ray_color(&ray)
-            };
+                color += ray::ray_color(&ray, &world);
+            }
 
-            color::write_color(&color, &mut std::io::stdout());
+            color::write_color(&mut std::io::stdout(), &color, SAMPLES_PER_PIXEL);
         }
     }
 }
