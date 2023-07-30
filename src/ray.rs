@@ -1,3 +1,4 @@
+use crate::math_traits::InnerProduct;
 use crate::vec3;
 
 pub struct Ray {

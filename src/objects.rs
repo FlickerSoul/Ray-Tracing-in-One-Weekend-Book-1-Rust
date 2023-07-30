@@ -34,8 +34,9 @@ impl Hittable for Sphere {
     }
 
     fn hit_ray_pos(&self, ray: &Ray) -> Option<f64> {
-        let c = (ray.origin - self.center).length_squared() - self.radius * self.radius;
-        let b = 2.0 * ray.direction.dot(ray.origin - self.center);
+        let oc = ray.origin - self.center;
+        let c = oc.length_squared() - self.radius * self.radius;
+        let b = 2.0 * ray.direction.dot(oc);
         let a = ray.direction.length_squared();
 
         let inner = b * b - 4.0 * a * c;
@@ -43,7 +44,7 @@ impl Hittable for Sphere {
         return if inner < 0.0 {
             None
         } else {
-            Some(-b - inner.sqrt() / (2.0 * a))
+            Some((-b - inner.sqrt()) / (2.0 * a))
         };
     }
 }

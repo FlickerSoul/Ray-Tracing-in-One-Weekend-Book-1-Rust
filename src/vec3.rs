@@ -19,14 +19,6 @@ impl Vec3 {
         Vec3::new(0.0, 0.0, 0.0)
     }
 
-    pub fn length_squared(&self) -> f64 {
-        self.x() * self.x() + self.y() * self.y() + self.z() * self.z()
-    }
-
-    pub fn length(&self) -> f64 {
-        self.length_squared().sqrt()
-    }
-
     pub const fn x(&self) -> f64 {
         self.coor[0]
     }
@@ -37,10 +29,6 @@ impl Vec3 {
 
     pub const fn z(&self) -> f64 {
         self.coor[2]
-    }
-
-    pub fn unit(&self) -> Self {
-        self.clone() / self.length()
     }
 }
 
@@ -121,6 +109,18 @@ impl math_traits::InnerProduct for Vec3 {
 
     fn dot(self, _rhs: Vec3) -> f64 {
         self.x() * _rhs.x() + self.y() * _rhs.y() + self.z() * _rhs.z()
+    }
+
+    fn length_squared(&self) -> f64 {
+        self.x() * self.x() + self.y() * self.y() + self.z() * self.z()
+    }
+
+    fn length(&self) -> f64 {
+        self.length_squared().sqrt()
+    }
+
+    fn unit(&self) -> Self {
+        self.clone() / self.length()
     }
 }
 

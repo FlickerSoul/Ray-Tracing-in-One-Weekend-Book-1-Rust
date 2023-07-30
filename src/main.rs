@@ -4,6 +4,7 @@ mod objects;
 mod ray;
 mod vec3;
 
+use math_traits::InnerProduct;
 use objects::Hittable;
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
@@ -41,15 +42,9 @@ fn main() {
 
             let color = if let Some(t) = sphere.hit_ray_pos(&ray) {
                 let point_on_sphere = ray.at(t);
-                let mut normal = point_on_sphere - sphere.center;
-                let offset = normal.x().min(normal.y().min(normal.z()));
+                let normal = (point_on_sphere - sphere.center).unit();
 
-                if offset < 0.0 {
-                    normal = normal + vec3::Vec3::new(-offset, -offset, -offset)
-                }
-                normal = normal.unit();
-
-                normal / normal.x().max(normal.y().max(normal.z()))
+                0.5 * (normal + vec3::Vec3::new(1.0, 1.0, 1.0))
             } else {
                 ray::ray_color(&ray)
             };
