@@ -1,4 +1,5 @@
-use crate::math_traits;
+use crate::math_traits::{CrossProduct, InnerProduct};
+use crate::utils::{random, random_range};
 use std::ops;
 
 #[derive(Debug, Copy, Clone)]
@@ -15,6 +16,29 @@ impl Vec3 {
         Vec3::from([x, y, z])
     }
 
+    pub fn random() -> Self {
+        Vec3::new(random(), random(), random())
+    }
+
+    pub fn random_from_range(min: f64, max: f64) -> Self {
+        Vec3::new(
+            random_range(min, max),
+            random_range(min, max),
+            random_range(min, max),
+        )
+    }
+
+    pub fn random_in_unit_sphere() -> Self {
+        loop {
+            let p = Self::random_from_range(-1.0, 1.0);
+            if p.length_squared() > 1.0 {
+                continue;
+            }
+
+            return p;
+        }
+    }
+
     pub const fn zero() -> Self {
         Vec3::new(0.0, 0.0, 0.0)
     }
@@ -29,6 +53,13 @@ impl Vec3 {
 
     pub const fn z(&self) -> f64 {
         self.coor[2]
+    }
+
+    pub fn gamma_correct(&mut self, gamma: f64) {
+        let inv_gamma = 1.0 / gamma;
+        self.coor[0] = self.coor[0].powf(inv_gamma);
+        self.coor[1] = self.coor[1].powf(inv_gamma);
+        self.coor[2] = self.coor[2].powf(inv_gamma);
     }
 }
 
@@ -108,7 +139,7 @@ impl ops::AddAssign<&Vec3> for Vec3 {
     }
 }
 
-impl math_traits::CrossProduct for Vec3 {
+impl CrossProduct for Vec3 {
     type Output = Vec3;
 
     fn cross(&self, _rhs: &Vec3) -> Vec3 {
@@ -120,7 +151,7 @@ impl math_traits::CrossProduct for Vec3 {
     }
 }
 
-impl math_traits::InnerProduct for Vec3 {
+impl InnerProduct for Vec3 {
     type Output = f64;
 
     fn dot(&self, _rhs: &Vec3) -> f64 {

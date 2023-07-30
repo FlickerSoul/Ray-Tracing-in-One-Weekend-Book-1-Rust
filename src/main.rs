@@ -12,6 +12,7 @@ const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: u32 = 512;
 const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
 const SAMPLES_PER_PIXEL: u32 = 100;
+const MAX_ITER: u32 = 5;
 
 fn main() {
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -36,7 +37,7 @@ fn main() {
                 let v = (j as f64 + utils::random()) / (IMAGE_HEIGHT - 1) as f64;
                 let ray = camera.get_ray(u, v);
 
-                color += ray::ray_color(&ray, &world);
+                color += ray::ray_color(&ray, &world, MAX_ITER);
             }
 
             color::write_color(&mut std::io::stdout(), &color, SAMPLES_PER_PIXEL);

@@ -27,9 +27,18 @@ pub fn background(ray: &Ray) -> vec3::Color {
 }
 
 #[inline(always)]
-pub fn ray_color(ray: &Ray, world: &Vec<Box<dyn Hittable>>) -> vec3::Color {
-    if let Some(record) = world.hit(&ray, 0.0, f64::INFINITY) {
-        0.5 * (record.normal + vec3::Vec3::new(1.0, 1.0, 1.0))
+pub fn ray_color(ray: &Ray, world: &Vec<Box<dyn Hittable>>, iter: u32) -> vec3::Color {
+    if iter <= 0 {
+        return vec3::Color::zero();
+    }
+
+    if let Some(record) = world.hit(&ray, 0.001, f64::INFINITY) {
+        let target = record.hit_point + record.normal + vec3::Vec3::random_in_unit_sphere();
+        0.5 * ray_color(
+            &Ray::new(record.hit_point, target - record.hit_point),
+            world,
+            iter - 1,
+        )
     } else {
         background(&ray)
     }
