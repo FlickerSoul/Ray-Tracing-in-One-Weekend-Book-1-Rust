@@ -28,7 +28,19 @@ pub fn background(ray: &Ray) -> vec3::Color {
 
 #[inline(always)]
 pub fn ray_color(ray: &Ray, world: &Vec<Box<dyn Hittable>>, iter: u32) -> vec3::Color {
-    ray_color_hemisphere(ray, world, iter)
+    if iter <= 0 {
+        return vec3::Color::zero();
+    }
+
+    if let Some(record) = world.hit(&ray, 0.001, f64::INFINITY) {
+        if let Some((color, out_ray)) = record.material.scatter(&ray, &record) {
+            ray_color(&out_ray, world, iter - 1) * color
+        } else {
+            vec3::Color::zero()
+        }
+    } else {
+        background(&ray)
+    }
 }
 
 #[allow(dead_code)]

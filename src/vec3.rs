@@ -75,6 +75,16 @@ impl Vec3 {
         self.coor[1] = self.coor[1].powf(inv_gamma);
         self.coor[2] = self.coor[2].powf(inv_gamma);
     }
+
+    #[inline(always)]
+    pub fn near_zero(&self) -> bool {
+        const EPS: f64 = 1e-8;
+        self.coor[0].abs() < EPS && self.coor[1].abs() < EPS && self.coor[2].abs() < EPS
+    }
+
+    pub fn reflected(&self, normal: &Vec3) -> Self {
+        *self - *normal * self.dot(normal) * 2.0
+    }
 }
 
 impl ops::Add for Vec3 {
@@ -102,6 +112,17 @@ impl ops::Mul<f64> for Vec3 {
 
     fn mul(self, _rhs: f64) -> Vec3 {
         Vec3::new(self.x() * _rhs, self.y() * _rhs, self.z() * _rhs)
+    }
+}
+
+impl ops::Mul<Vec3> for Vec3 {
+    type Output = Vec3;
+    fn mul(self, _rhs: Vec3) -> Self::Output {
+        Vec3::new(
+            self.x() * _rhs.x(),
+            self.y() * _rhs.y(),
+            self.z() * _rhs.z(),
+        )
     }
 }
 
