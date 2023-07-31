@@ -7,6 +7,7 @@ mod ray;
 mod utils;
 mod vec3;
 
+use math_traits::InnerProduct;
 use objects::Hittable;
 use std::rc::Rc;
 
@@ -67,9 +68,11 @@ fn make_camera() -> camera::Camera {
     let from = vec3::Point3::new(-2.0, 2.0, 1.0);
     let at = vec3::Point3::new(0.0, 0.0, -1.0);
     let up = vec3::Vec3::new(0.0, 1.0, 0.0);
-    let fov = 90.0;
+    let fov = 20.0;
+    let aperture = 2.0;
+    let distance_to_focus = (from - at).length();
 
-    let camera = camera::Camera::new(from, at, up, fov, ASPECT_RATIO);
+    let camera = camera::Camera::new(from, at, up, fov, ASPECT_RATIO, aperture, distance_to_focus);
     camera
 }
 
