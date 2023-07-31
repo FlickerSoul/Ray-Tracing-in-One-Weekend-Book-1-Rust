@@ -25,3 +25,8 @@ pub fn clamp(x: f64, min: f64, max: f64) -> f64 {
 pub fn clamp_color(x: f64, min: f64, max: f64) -> u32 {
     (256.0 * clamp(x, min, max)) as u32
 }
+
+#[inline(always)]
+pub fn degrees_to_radians(degrees: f64) -> f64 {
+    degrees * std::f64::consts::PI / 180.0
+}

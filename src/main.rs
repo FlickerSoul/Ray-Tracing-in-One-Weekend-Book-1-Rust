@@ -16,8 +16,10 @@ const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
 const SAMPLES_PER_PIXEL: u32 = 100;
 const MAX_ITER: u32 = 5;
 
+pub type WorldType = Vec<Box<dyn Hittable>>;
+
 #[allow(dead_code)]
-fn setup_world() -> Vec<Box<dyn Hittable>> {
+fn setup_world() -> WorldType {
     let ground_mat = Rc::new(material::Lambertian::new(vec3::Color::new(0.8, 0.8, 0.0)));
     let center_mat = Rc::new(material::Lambertian::new(vec3::Color::new(0.7, 0.3, 0.3)));
     let metal_shiny_mat = Rc::new(material::Metal::new(vec3::Color::new(0.8, 0.8, 0.8), 0.3));
@@ -49,7 +51,7 @@ fn setup_world() -> Vec<Box<dyn Hittable>> {
         metal_shiny_mat.clone(),
     );
 
-    let mut world: Vec<Box<dyn Hittable>> = vec![];
+    let mut world: WorldType = vec![];
 
     world.push(Box::new(center));
     world.push(Box::new(ground));
@@ -61,10 +63,41 @@ fn setup_world() -> Vec<Box<dyn Hittable>> {
     world
 }
 
+fn make_camera() -> camera::Camera {
+    let from = vec3::Point3::new(-2.0, 2.0, 1.0);
+    let at = vec3::Point3::new(0.0, 0.0, -1.0);
+    let up = vec3::Vec3::new(0.0, 1.0, 0.0);
+    let fov = 90.0;
+
+    let camera = camera::Camera::new(from, at, up, fov, ASPECT_RATIO);
+    camera
+}
+
+fn make_test_world() -> WorldType {
+    let mut world: WorldType = vec![];
+
+    let R: f64 = (std::f64::consts::PI / 4.0).cos();
+
+    let center_mat = Rc::new(material::Lambertian::new(vec3::Color::new(0.7, 0.3, 0.3)));
+
+    world.push(Box::new(objects::Sphere::new(
+        vec3::Point3::new(-R, 0.0, -1.0),
+        R,
+        center_mat.clone(),
+    )));
+    world.push(Box::new(objects::Sphere::new(
+        vec3::Point3::new(R, 0.0, -1.0),
+        R,
+        center_mat.clone(),
+    )));
+
+    world
+}
+
 fn main() {
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
 
-    let camera = camera::Camera::default();
+    let camera = make_camera();
     let world = setup_world();
 
     for j in (0..IMAGE_HEIGHT).rev() {
