@@ -82,8 +82,18 @@ impl Vec3 {
         self.coor[0].abs() < EPS && self.coor[1].abs() < EPS && self.coor[2].abs() < EPS
     }
 
+    #[inline(always)]
     pub fn reflected(&self, normal: &Vec3) -> Self {
         *self - *normal * self.dot(normal) * 2.0
+    }
+
+    #[inline(always)]
+    pub fn refracted(&self, normal: &Vec3, etai_over_eta: f64) -> Self {
+        let cos_theta = normal.dot(&-self).min(1.0);
+        let out_perp = etai_over_eta * (self + cos_theta * normal);
+        let out_para = -(1.0 - out_perp.length_squared()).abs().sqrt() * normal;
+
+        out_perp + out_para
     }
 }
 
@@ -99,10 +109,41 @@ impl ops::Add for Vec3 {
     }
 }
 
+impl<'a, 'b> ops::Add<&'a Vec3> for &'b Vec3 {
+    type Output = Vec3;
+
+    fn add(self, _rhs: &'a Vec3) -> Vec3 {
+        Vec3::new(
+            self.x() + _rhs.x(),
+            self.y() + _rhs.y(),
+            self.z() + _rhs.z(),
+        )
+    }
+}
+
+impl<'a> ops::Add<Vec3> for &'a Vec3 {
+    type Output = Vec3;
+
+    fn add(self, _rhs: Vec3) -> Vec3 {
+        Vec3::new(
+            self.x() + _rhs.x(),
+            self.y() + _rhs.y(),
+            self.z() + _rhs.z(),
+        )
+    }
+}
+
 impl ops::Neg for Vec3 {
     type Output = Vec3;
 
     fn neg(self) -> Vec3 {
+        Vec3::new(-self.x(), -self.y(), -self.z())
+    }
+}
+
+impl<'a> ops::Neg for &'a Vec3 {
+    type Output = Vec3;
+    fn neg(self) -> Self::Output {
         Vec3::new(-self.x(), -self.y(), -self.z())
     }
 }
@@ -139,6 +180,14 @@ impl ops::Div<f64> for Vec3 {
 
     fn div(self, _rhs: f64) -> Vec3 {
         self * (1.0 / _rhs)
+    }
+}
+
+impl<'a> ops::Mul<&'a Vec3> for f64 {
+    type Output = Vec3;
+
+    fn mul(self, _rhs: &'a Vec3) -> Vec3 {
+        *_rhs * self
     }
 }
 
