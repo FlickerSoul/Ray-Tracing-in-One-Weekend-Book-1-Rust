@@ -84,14 +84,14 @@ impl Vec3 {
 
     #[inline(always)]
     pub fn reflected(&self, normal: &Vec3) -> Self {
-        *self - *normal * self.dot(normal) * 2.0
+        *self - self.dot(normal) * 2.0 * normal
     }
 
     #[inline(always)]
     pub fn refracted(&self, normal: &Vec3, etai_over_eta: f64) -> Self {
-        let cos_theta = normal.dot(&-self).min(1.0);
+        let cos_theta = (-self).dot(normal).min(1.0);
         let out_perp = etai_over_eta * (self + cos_theta * normal);
-        let out_para = -(1.0 - out_perp.length_squared()).abs().sqrt() * normal;
+        let out_para = (1.0 - out_perp.length_squared()).abs().sqrt() * -normal;
 
         out_perp + out_para
     }

@@ -77,6 +77,7 @@ impl Dielectric {
 impl Material for Dielectric {
     fn scatter(&self, ray: &Ray, record: &HitRecord) -> Option<(Color, Ray)> {
         const attenuation: Color = Color::new(1.0, 1.0, 1.0);
+
         let refraction_ratio = if record.front_face {
             1.0 / self.ir
         } else {
@@ -84,7 +85,7 @@ impl Material for Dielectric {
         };
 
         let ray_unit_dir = ray.direction.unit();
-        let cos_theta = record.normal.dot(&-ray_unit_dir).min(1.0);
+        let cos_theta = (-ray_unit_dir).dot(&record.normal).min(1.0);
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
         let cannot_refract = refraction_ratio * sin_theta > 1.0;

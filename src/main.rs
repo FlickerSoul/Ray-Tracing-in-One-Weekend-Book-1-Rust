@@ -30,7 +30,9 @@ fn setup_world() -> Vec<Box<dyn Hittable>> {
         100.0,
         ground_mat.clone(),
     );
-    let sphere = objects::Sphere::new(vec3::Point3::new(0.0, 0.0, -1.0), 0.5, center_mat.clone());
+
+    let center = objects::Sphere::new(vec3::Point3::new(0.0, 0.0, -1.0), 0.5, center_mat.clone());
+
     let left = objects::Sphere::new(vec3::Point3::new(-1.0, 0.0, -1.0), 0.5, glassy_mat.clone());
     let left_inner =
         objects::Sphere::new(vec3::Vec3::new(-1.0, 0.0, -1.0), -0.4, glassy_mat.clone());
@@ -40,6 +42,7 @@ fn setup_world() -> Vec<Box<dyn Hittable>> {
         0.5,
         metal_dull_mat.clone(),
     );
+
     let up = objects::Sphere::new(
         vec3::Point3::new(0.0, 1.0, -1.0),
         0.5,
@@ -48,7 +51,7 @@ fn setup_world() -> Vec<Box<dyn Hittable>> {
 
     let mut world: Vec<Box<dyn Hittable>> = vec![];
 
-    world.push(Box::new(sphere));
+    world.push(Box::new(center));
     world.push(Box::new(ground));
     world.push(Box::new(left));
     world.push(Box::new(left_inner));
