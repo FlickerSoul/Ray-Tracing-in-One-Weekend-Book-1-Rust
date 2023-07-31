@@ -2,14 +2,17 @@ use crate::material::Material;
 use crate::math_traits::InnerProduct;
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
-use std::rc::Rc;
+use std::marker::Sync;
+use std::sync::Arc;
+
+type MaterialArc = Arc<dyn Material + Sync + Send>;
 
 pub struct HitRecord {
     pub t: f64,
     pub hit_point: Point3,
     pub normal: Vec3,
     pub front_face: bool,
-    pub material: Rc<dyn Material>,
+    pub material: MaterialArc,
 }
 
 impl HitRecord {
@@ -18,7 +21,7 @@ impl HitRecord {
         hit_point: Point3,
         normal: Vec3,
         front_face: bool,
-        material: &Rc<dyn Material>,
+        material: &MaterialArc,
     ) -> Self {
         HitRecord {
             t,
@@ -37,11 +40,11 @@ pub trait Hittable {
 pub struct Sphere {
     pub center: Point3,
     pub radius: f64,
-    pub material: Rc<dyn Material>,
+    pub material: MaterialArc,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64, material: Rc<dyn Material>) -> Self {
+    pub fn new(center: Point3, radius: f64, material: MaterialArc) -> Self {
         Sphere {
             center,
             radius,
@@ -91,7 +94,7 @@ impl Hittable for Sphere {
     }
 }
 
-impl Hittable for Vec<Box<dyn Hittable>> {
+impl Hittable for crate::WorldType {
     fn hit(&self, ray: &Ray, min: f64, max: f64) -> Option<HitRecord> {
         self.iter()
             .filter_map(|e| e.hit(ray, min, max))

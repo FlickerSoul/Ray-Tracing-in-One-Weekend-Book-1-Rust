@@ -27,7 +27,7 @@ pub fn background(ray: &Ray) -> vec3::Color {
 }
 
 #[inline(always)]
-pub fn ray_color(ray: &Ray, world: &Vec<Box<dyn Hittable>>, iter: u32) -> vec3::Color {
+pub fn ray_color(ray: &Ray, world: &crate::WorldType, iter: u32) -> vec3::Color {
     if iter <= 0 {
         return vec3::Color::zero();
     }
@@ -45,7 +45,7 @@ pub fn ray_color(ray: &Ray, world: &Vec<Box<dyn Hittable>>, iter: u32) -> vec3::
 
 #[allow(dead_code)]
 #[inline(always)]
-pub fn ray_color_unit_vector(ray: &Ray, world: &Vec<Box<dyn Hittable>>, iter: u32) -> vec3::Color {
+pub fn ray_color_unit_vector(ray: &Ray, world: &crate::WorldType, iter: u32) -> vec3::Color {
     if iter <= 0 {
         return vec3::Color::zero();
     }
@@ -61,8 +61,10 @@ pub fn ray_color_unit_vector(ray: &Ray, world: &Vec<Box<dyn Hittable>>, iter: u3
         background(&ray)
     }
 }
+
+#[allow(dead_code)]
 #[inline(always)]
-pub fn ray_color_hemisphere(ray: &Ray, world: &Vec<Box<dyn Hittable>>, iter: u32) -> vec3::Color {
+pub fn ray_color_hemisphere(ray: &Ray, world: &crate::WorldType, iter: u32) -> vec3::Color {
     if iter <= 0 {
         return vec3::Color::zero();
     }
@@ -81,7 +83,7 @@ pub fn ray_color_hemisphere(ray: &Ray, world: &Vec<Box<dyn Hittable>>, iter: u32
 
 #[allow(dead_code)]
 #[inline(always)]
-pub fn ray_color_unit_sphere(ray: &Ray, world: &Vec<Box<dyn Hittable>>, iter: u32) -> vec3::Color {
+pub fn ray_color_unit_sphere(ray: &Ray, world: &crate::WorldType, iter: u32) -> vec3::Color {
     if iter <= 0 {
         return vec3::Color::zero();
     }
