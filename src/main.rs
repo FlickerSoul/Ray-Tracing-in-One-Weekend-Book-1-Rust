@@ -12,9 +12,9 @@ use std::sync::Arc;
 use std::thread;
 
 const ASPECT_RATIO: f64 = 3.0 / 2.0;
-const IMAGE_WIDTH: u32 = 1200;
+const IMAGE_WIDTH: u32 = 500;
 const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
-const SAMPLES_PER_PIXEL: u32 = 100;
+const SAMPLES_PER_PIXEL: u32 = 10;
 const MAX_ITER: u32 = 5;
 
 pub type WorldType = Vec<Box<dyn Hittable + Sync + Send>>;
@@ -91,7 +91,10 @@ fn setup_world(seed: Option<usize>) -> WorldType {
             if mat_choice < 0.8 {
                 let albedo = vec3::Color::random() * vec3::Color::random();
                 let sphere_mat = Arc::new(material::Lambertian::new(albedo));
-                world.push(Box::new(objects::Sphere::new(center, 0.2, sphere_mat)));
+                let center2 = center + vec3::Vec3::new(0.0, utils::random_range(0.0, 0.5), 0.0);
+                world.push(Box::new(objects::MovingSphere::new(
+                    center, center2, 0.0, 1.0, 0.2, sphere_mat,
+                )));
             } else if mat_choice < 0.95 {
                 let albedo = vec3::Color::random_from_range(0.5, 1.0);
                 let fuzz = utils::random_range(0.0, 0.5);
@@ -134,7 +137,17 @@ fn make_camera() -> camera::Camera {
     let aperture = 0.1;
     let distance_to_focus = 10.0;
 
-    let camera = camera::Camera::new(from, at, up, fov, ASPECT_RATIO, aperture, distance_to_focus);
+    let camera = camera::Camera::with_timing(
+        from,
+        at,
+        up,
+        fov,
+        ASPECT_RATIO,
+        aperture,
+        distance_to_focus,
+        0.0,
+        1.0,
+    );
     camera
 }
 

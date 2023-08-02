@@ -5,11 +5,24 @@ use crate::vec3;
 pub struct Ray {
     pub origin: vec3::Point3,
     pub direction: vec3::Vec3,
+    pub time: f64,
 }
 
 impl Ray {
     pub fn new(origin: vec3::Point3, direction: vec3::Vec3) -> Self {
-        Ray { origin, direction }
+        Ray {
+            origin,
+            direction,
+            time: 0.0,
+        }
+    }
+
+    pub fn with_timing(origin: vec3::Point3, direction: vec3::Vec3, time: f64) -> Self {
+        Ray {
+            origin,
+            direction,
+            time,
+        }
     }
 
     pub fn at(&self, t: f64) -> vec3::Point3 {

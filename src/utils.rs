@@ -7,7 +7,7 @@ pub fn random() -> f64 {
 
 #[inline(always)]
 pub fn random_range(min: f64, max: f64) -> f64 {
-    rand::thread_rng().gen_range(min..max)
+    rand::thread_rng().gen_range(min..=max)
 }
 
 #[inline(always)]
