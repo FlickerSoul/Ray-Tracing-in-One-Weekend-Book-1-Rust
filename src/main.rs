@@ -66,7 +66,20 @@ fn setup_simple_world() -> WorldType {
         1.0, 1.0, 1.0,
     )));
     world.push(Arc::new(objects::XyPlane::new(
-        0.0, 0.0, 3.0, 3.0, 1.0, light_mat,
+        -2.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        light_mat.clone(),
+    )));
+    world.push(Arc::new(objects::XyPlane::new(
+        -2.0,
+        0.0,
+        0.0,
+        1.0,
+        -2.0,
+        light_mat.clone(),
     )));
 
     world.push(Arc::new(center));

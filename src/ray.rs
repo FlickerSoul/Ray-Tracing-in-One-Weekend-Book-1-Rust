@@ -40,6 +40,11 @@ pub fn background(ray: &Ray) -> vec3::Color {
 }
 
 #[inline(always)]
+pub fn dark_background(_ray: &Ray) -> vec3::Color {
+    vec3::Color::zero()
+}
+
+#[inline(always)]
 pub fn ray_color(ray: &Ray, world: &crate::WorldType, iter: u32) -> vec3::Color {
     if iter <= 0 {
         return vec3::Color::zero();
@@ -53,7 +58,7 @@ pub fn ray_color(ray: &Ray, world: &crate::WorldType, iter: u32) -> vec3::Color 
             emitted
         }
     } else {
-        background(&ray)
+        dark_background(&ray)
     }
 }
 
