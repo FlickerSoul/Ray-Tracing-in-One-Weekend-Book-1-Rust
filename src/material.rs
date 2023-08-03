@@ -1,20 +1,28 @@
 use crate::math_traits::InnerProduct;
 use crate::objects::HitRecord;
 use crate::ray::Ray;
+use crate::texture::{SolidTexture, WrappedTextureType};
 use crate::utils::random;
 use crate::vec3::{Color, Vec3};
+use std::sync::Arc;
 
 pub trait Material {
     fn scatter(&self, ray: &Ray, record: &HitRecord) -> Option<(Color, Ray)>;
 }
 
 pub struct Lambertian {
-    pub albedo: Color,
+    pub albedo: WrappedTextureType,
 }
 
 impl Lambertian {
-    pub fn new(albedo: Color) -> Self {
+    pub fn new(albedo: WrappedTextureType) -> Self {
         Lambertian { albedo }
+    }
+
+    pub fn with_color(albedo: Color) -> Self {
+        Lambertian {
+            albedo: Arc::new(SolidTexture::new(albedo)),
+        }
     }
 }
 
@@ -27,7 +35,11 @@ impl Material for Lambertian {
         }
 
         let scatter_ray = Ray::with_timing(record.hit_point, scatter_dir, ray.time);
-        Some((self.albedo, scatter_ray))
+        Some((
+            self.albedo
+                .color_value(record.u, record.v, &record.hit_point),
+            scatter_ray,
+        ))
     }
 }
 

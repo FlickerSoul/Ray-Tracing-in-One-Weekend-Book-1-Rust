@@ -5,6 +5,7 @@ mod material;
 mod math_traits;
 mod objects;
 mod ray;
+mod texture;
 mod utils;
 mod vec3;
 
@@ -23,8 +24,12 @@ pub type WorldType = Vec<WorldElementType>;
 
 #[allow(dead_code)]
 fn setup_simple_world() -> WorldType {
-    let ground_mat = Arc::new(material::Lambertian::new(vec3::Color::new(0.8, 0.8, 0.0)));
-    let center_mat = Arc::new(material::Lambertian::new(vec3::Color::new(0.7, 0.3, 0.3)));
+    let ground_mat = Arc::new(material::Lambertian::with_color(vec3::Color::new(
+        0.8, 0.8, 0.0,
+    )));
+    let center_mat = Arc::new(material::Lambertian::with_color(vec3::Color::new(
+        0.7, 0.3, 0.3,
+    )));
     let metal_shiny_mat = Arc::new(material::Metal::new(vec3::Color::new(0.8, 0.8, 0.8), 0.3));
     let metal_dull_mat = Arc::new(material::Metal::new(vec3::Color::new(0.8, 0.6, 0.2), 1.0));
 
@@ -71,7 +76,9 @@ fn setup_world(seed: Option<usize>) -> WorldType {
 
     let mut world = WorldType::new();
 
-    let ground_mat = Arc::new(material::Lambertian::new(vec3::Color::new(0.5, 0.5, 0.5)));
+    let ground_mat = Arc::new(material::Lambertian::with_color(vec3::Color::new(
+        0.5, 0.5, 0.5,
+    )));
     world.push(Arc::new(objects::Sphere::new(
         vec3::Point3::new(0.0, -1000.0, 0.0),
         1000.0,
@@ -92,7 +99,7 @@ fn setup_world(seed: Option<usize>) -> WorldType {
 
             if mat_choice < 0.8 {
                 let albedo = vec3::Color::random() * vec3::Color::random();
-                let sphere_mat = Arc::new(material::Lambertian::new(albedo));
+                let sphere_mat = Arc::new(material::Lambertian::with_color(albedo));
                 let center2 = center + vec3::Vec3::new(0.0, utils::random_range(0.0, 0.5), 0.0);
                 world.push(Arc::new(objects::MovingSphere::new(
                     center, center2, 0.0, 1.0, 0.2, sphere_mat,
@@ -115,7 +122,9 @@ fn setup_world(seed: Option<usize>) -> WorldType {
         1.0,
         mat1,
     )));
-    let mat2 = Arc::new(material::Lambertian::new(vec3::Color::new(0.4, 0.2, 0.1)));
+    let mat2 = Arc::new(material::Lambertian::with_color(vec3::Color::new(
+        0.4, 0.2, 0.1,
+    )));
     world.push(Arc::new(objects::Sphere::new(
         vec3::Point3::new(-4.0, 1.0, 0.0),
         1.0,

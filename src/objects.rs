@@ -10,6 +10,8 @@ type MaterialArc = Arc<dyn Material + Sync + Send>;
 
 pub struct HitRecord {
     pub t: f64,
+    pub u: f64,
+    pub v: f64,
     pub hit_point: Point3,
     pub normal: Vec3,
     pub front_face: bool,
@@ -19,6 +21,8 @@ pub struct HitRecord {
 impl HitRecord {
     fn new(
         t: f64,
+        u: f64,
+        v: f64,
         hit_point: Point3,
         normal: Vec3,
         front_face: bool,
@@ -26,6 +30,8 @@ impl HitRecord {
     ) -> Self {
         HitRecord {
             t,
+            u,
+            v,
             hit_point,
             normal,
             front_face,
@@ -52,6 +58,15 @@ impl Sphere {
             radius,
             material,
         }
+    }
+
+    fn get_uv(&self, p: &Vec3) -> (f64, f64) {
+        let theta = -p.y().acos();
+        let phi = -p.z().atan2(p.x()) + std::f64::consts::PI;
+        let u = phi / (2.0 * std::f64::consts::PI);
+        let v = theta / std::f64::consts::PI;
+
+        (u, v)
     }
 }
 
@@ -86,8 +101,12 @@ impl Hittable for Sphere {
             (out_normal, true)
         };
 
+        let (u, v) = self.get_uv(&normal);
+
         return Some(HitRecord::new(
             t,
+            u,
+            v,
             hit_point,
             normal,
             front_face,
@@ -165,6 +184,15 @@ impl MovingSphere {
             + (time - self.start_time) / (self.end_time - self.start_time)
                 * (self.end_center - self.start_center)
     }
+
+    fn get_uv(&self, p: &Vec3) -> (f64, f64) {
+        let theta = -p.y().acos();
+        let phi = -p.z().atan2(p.x()) + std::f64::consts::PI;
+        let u = phi / (2.0 * std::f64::consts::PI);
+        let v = theta / std::f64::consts::PI;
+
+        (u, v)
+    }
 }
 
 impl Hittable for MovingSphere {
@@ -206,8 +234,12 @@ impl Hittable for MovingSphere {
             (out_normal, true)
         };
 
+        let (u, v) = self.get_uv(&out_normal);
+
         return Some(HitRecord::new(
             t,
+            u,
+            v,
             hit_point,
             normal,
             front_face,
