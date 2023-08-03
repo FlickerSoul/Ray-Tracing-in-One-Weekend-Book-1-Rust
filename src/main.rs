@@ -76,9 +76,12 @@ fn setup_world(seed: Option<usize>) -> WorldType {
 
     let mut world = WorldType::new();
 
-    let ground_mat = Arc::new(material::Lambertian::with_color(vec3::Color::new(
-        0.5, 0.5, 0.5,
-    )));
+    let ground_tx = Arc::new(texture::CheckerTexture::with_color(
+        vec3::Color::new(0.2, 0.3, 0.1),
+        vec3::Color::new(0.9, 0.9, 0.9),
+    ));
+
+    let ground_mat = Arc::new(material::Lambertian::new(ground_tx));
     world.push(Arc::new(objects::Sphere::new(
         vec3::Point3::new(0.0, -1000.0, 0.0),
         1000.0,

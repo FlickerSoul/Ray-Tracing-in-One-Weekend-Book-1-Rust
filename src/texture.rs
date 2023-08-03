@@ -43,7 +43,7 @@ impl CheckerTexture {
 
 impl Texture for CheckerTexture {
     fn color_value(&self, u: f64, v: f64, p: &Point3) -> Color {
-        let check = (10.0 * u).sin() + (10.0 * v).sin() + (10.0 * p.z()).sin();
+        let check = (10.0 * p.x()).sin() * (10.0 * p.y()).sin() * (10.0 * p.z()).sin();
         if check < 0.0 {
             self.odd.color_value(u, v, p)
         } else {
