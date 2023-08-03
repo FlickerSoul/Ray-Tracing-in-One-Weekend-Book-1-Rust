@@ -106,6 +106,21 @@ impl Vec3 {
 
         out_perp + out_para
     }
+
+    pub fn merge_min(&self, other: &Vec3) -> Self {
+        Vec3::new(
+            self.x().min(other.x()),
+            self.y().min(other.y()),
+            self.z().min(other.z()),
+        )
+    }
+    pub fn merge_max(&self, other: &Vec3) -> Self {
+        Vec3::new(
+            self.x().max(other.x()),
+            self.y().max(other.y()),
+            self.z().max(other.z()),
+        )
+    }
 }
 
 impl ops::Add for Vec3 {

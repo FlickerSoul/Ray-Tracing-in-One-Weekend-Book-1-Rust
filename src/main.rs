@@ -1,3 +1,4 @@
+mod bb;
 mod camera;
 mod color;
 mod material;
@@ -17,7 +18,8 @@ const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
 const SAMPLES_PER_PIXEL: u32 = 10;
 const MAX_ITER: u32 = 5;
 
-pub type WorldType = Vec<Box<dyn Hittable + Sync + Send>>;
+pub type WorldElementType = Arc<dyn Hittable + Sync + Send>;
+pub type WorldType = Vec<WorldElementType>;
 
 #[allow(dead_code)]
 fn setup_simple_world() -> WorldType {
@@ -54,12 +56,12 @@ fn setup_simple_world() -> WorldType {
 
     let mut world: WorldType = vec![];
 
-    world.push(Box::new(center));
-    world.push(Box::new(ground));
-    world.push(Box::new(left));
-    world.push(Box::new(left_inner));
-    world.push(Box::new(right));
-    world.push(Box::new(up));
+    world.push(Arc::new(center));
+    world.push(Arc::new(ground));
+    world.push(Arc::new(left));
+    world.push(Arc::new(left_inner));
+    world.push(Arc::new(right));
+    world.push(Arc::new(up));
 
     world
 }
@@ -70,7 +72,7 @@ fn setup_world(seed: Option<usize>) -> WorldType {
     let mut world = WorldType::new();
 
     let ground_mat = Arc::new(material::Lambertian::new(vec3::Color::new(0.5, 0.5, 0.5)));
-    world.push(Box::new(objects::Sphere::new(
+    world.push(Arc::new(objects::Sphere::new(
         vec3::Point3::new(0.0, -1000.0, 0.0),
         1000.0,
         ground_mat,
@@ -92,35 +94,35 @@ fn setup_world(seed: Option<usize>) -> WorldType {
                 let albedo = vec3::Color::random() * vec3::Color::random();
                 let sphere_mat = Arc::new(material::Lambertian::new(albedo));
                 let center2 = center + vec3::Vec3::new(0.0, utils::random_range(0.0, 0.5), 0.0);
-                world.push(Box::new(objects::MovingSphere::new(
+                world.push(Arc::new(objects::MovingSphere::new(
                     center, center2, 0.0, 1.0, 0.2, sphere_mat,
                 )));
             } else if mat_choice < 0.95 {
                 let albedo = vec3::Color::random_from_range(0.5, 1.0);
                 let fuzz = utils::random_range(0.0, 0.5);
                 let sphere_mat = Arc::new(material::Metal::new(albedo, fuzz));
-                world.push(Box::new(objects::Sphere::new(center, 0.2, sphere_mat)));
+                world.push(Arc::new(objects::Sphere::new(center, 0.2, sphere_mat)));
             } else {
                 let sphere_mat = Arc::new(material::Dielectric::new(1.5));
-                world.push(Box::new(objects::Sphere::new(center, 0.2, sphere_mat)));
+                world.push(Arc::new(objects::Sphere::new(center, 0.2, sphere_mat)));
             }
         }
     }
 
     let mat1 = Arc::new(material::Dielectric::new(1.5));
-    world.push(Box::new(objects::Sphere::new(
+    world.push(Arc::new(objects::Sphere::new(
         vec3::Point3::new(0.0, 1.0, 0.0),
         1.0,
         mat1,
     )));
     let mat2 = Arc::new(material::Lambertian::new(vec3::Color::new(0.4, 0.2, 0.1)));
-    world.push(Box::new(objects::Sphere::new(
+    world.push(Arc::new(objects::Sphere::new(
         vec3::Point3::new(-4.0, 1.0, 0.0),
         1.0,
         mat2,
     )));
     let mat3 = Arc::new(material::Metal::new(vec3::Color::new(0.7, 0.6, 0.5), 0.0));
-    world.push(Box::new(objects::Sphere::new(
+    world.push(Arc::new(objects::Sphere::new(
         vec3::Point3::new(4.0, 1.0, 0.0),
         1.0,
         mat3,

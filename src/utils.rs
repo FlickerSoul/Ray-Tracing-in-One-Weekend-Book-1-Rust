@@ -11,6 +11,16 @@ pub fn random_range(min: f64, max: f64) -> f64 {
 }
 
 #[inline(always)]
+pub fn random_int(min: isize, max: isize) -> isize {
+    rand::thread_rng().gen_range(min..=max)
+}
+
+#[inline(always)]
+pub fn random_uint(min: usize, max: usize) -> usize {
+    rand::thread_rng().gen_range(min..=max)
+}
+
+#[inline(always)]
 pub fn clamp(x: f64, min: f64, max: f64) -> f64 {
     if x < min {
         min

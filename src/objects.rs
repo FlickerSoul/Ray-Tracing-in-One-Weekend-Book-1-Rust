@@ -1,3 +1,4 @@
+use crate::bb::{BoundingBoxHit, BoxedBoundingBoxType, AABB};
 use crate::material::Material;
 use crate::math_traits::InnerProduct;
 use crate::ray::Ray;
@@ -35,6 +36,7 @@ impl HitRecord {
 
 pub trait Hittable {
     fn hit(&self, ray: &Ray, min: f64, max: f64) -> Option<HitRecord>;
+    fn bounding_box(&self, start_time: f64, end_time: f64) -> Option<BoxedBoundingBoxType>;
 }
 
 pub struct Sphere {
@@ -92,6 +94,13 @@ impl Hittable for Sphere {
             &self.material,
         ));
     }
+
+    fn bounding_box(&self, _: f64, _: f64) -> Option<BoxedBoundingBoxType> {
+        Some(Arc::new(AABB::new(
+            self.center - Vec3::new(self.radius, self.radius, self.radius),
+            self.center + Vec3::new(self.radius, self.radius, self.radius),
+        )))
+    }
 }
 
 impl Hittable for crate::WorldType {
@@ -99,6 +108,27 @@ impl Hittable for crate::WorldType {
         self.iter()
             .filter_map(|e| e.hit(ray, min, max))
             .min_by(|a, b| a.t.total_cmp(&b.t))
+    }
+
+    fn bounding_box(&self, start_time: f64, end_time: f64) -> Option<BoxedBoundingBoxType> {
+        if self.len() == 0 {
+            return None;
+        }
+
+        let mut result_box: BoxedBoundingBoxType =
+            Arc::new(AABB::new(Point3::zero(), Point3::zero()));
+
+        for item in self {
+            let new_box = item.bounding_box(start_time, end_time);
+            match new_box {
+                None => {}
+                Some(new_box) => {
+                    result_box = result_box.merge(new_box);
+                }
+            }
+        }
+
+        Some(result_box)
     }
 }
 
@@ -141,6 +171,10 @@ impl Hittable for MovingSphere {
     fn hit(&self, ray: &Ray, min: f64, max: f64) -> Option<HitRecord> {
         let hit_time = ray.time;
 
+        if hit_time < self.start_time || hit_time > self.end_time {
+            return None;
+        }
+
         let moving_center = self.moving_center(hit_time);
 
         let oc = ray.origin - moving_center;
@@ -179,5 +213,17 @@ impl Hittable for MovingSphere {
             front_face,
             &self.material,
         ));
+    }
+
+    fn bounding_box(&self, start_time: f64, end_time: f64) -> Option<BoxedBoundingBoxType> {
+        let start_ball = AABB::new(
+            self.moving_center(start_time) - Point3::new(self.radius, self.radius, self.radius),
+            self.moving_center(start_time) + Point3::new(self.radius, self.radius, self.radius),
+        );
+        let end_ball = AABB::new(
+            self.moving_center(end_time) - Point3::new(self.radius, self.radius, self.radius),
+            self.moving_center(end_time) + Point3::new(self.radius, self.radius, self.radius),
+        );
+        return Some(start_ball.merge(Arc::new(end_ball)));
     }
 }
