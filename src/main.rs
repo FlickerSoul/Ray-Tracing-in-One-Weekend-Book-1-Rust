@@ -3,6 +3,7 @@ mod camera;
 mod color;
 mod material;
 mod math_traits;
+mod noise;
 mod objects;
 mod ray;
 mod texture;
@@ -138,6 +139,14 @@ fn setup_world(seed: Option<usize>) -> WorldType {
         vec3::Point3::new(4.0, 1.0, 0.0),
         1.0,
         mat3,
+    )));
+    let mat4 = Arc::new(material::Lambertian::new(Arc::new(
+        noise::PerlinNoise::new(),
+    )));
+    world.push(Arc::new(objects::Sphere::new(
+        vec3::Point3::new(0.0, 1.0, 2.0),
+        1.0,
+        mat4,
     )));
 
     world
