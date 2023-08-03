@@ -40,12 +40,12 @@ pub fn background(ray: &Ray) -> vec3::Color {
 }
 
 #[inline(always)]
-pub fn dark_background(_ray: &Ray) -> vec3::Color {
-    vec3::Color::zero()
-}
-
-#[inline(always)]
-pub fn ray_color(ray: &Ray, world: &crate::WorldType, iter: u32) -> vec3::Color {
+pub fn ray_color(
+    ray: &Ray,
+    world: &crate::WorldType,
+    iter: u32,
+    background: &vec3::Color,
+) -> vec3::Color {
     if iter <= 0 {
         return vec3::Color::zero();
     }
@@ -53,12 +53,12 @@ pub fn ray_color(ray: &Ray, world: &crate::WorldType, iter: u32) -> vec3::Color 
     if let Some(record) = world.hit(&ray, 0.001, f64::INFINITY) {
         let emitted = record.material.emit(record.u, record.v, &record.hit_point);
         if let Some((color, out_ray)) = record.material.scatter(&ray, &record) {
-            emitted + ray_color(&out_ray, world, iter - 1) * color
+            emitted + ray_color(&out_ray, world, iter - 1, background) * color
         } else {
             emitted
         }
     } else {
-        dark_background(&ray)
+        *background
     }
 }
 
