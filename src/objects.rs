@@ -1,6 +1,6 @@
 use crate::bb::{BoundingBoxHit, BoxedBoundingBoxType, AABB};
 use crate::material::Material;
-use crate::math_traits::InnerProduct;
+use crate::math_traits::{CrossProduct, InnerProduct};
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 use std::marker::Sync;
@@ -257,5 +257,73 @@ impl Hittable for MovingSphere {
             self.moving_center(end_time) + Point3::new(self.radius, self.radius, self.radius),
         );
         return Some(start_ball.merge(Arc::new(end_ball)));
+    }
+}
+
+pub struct XyPlane {
+    pub x0: f64,
+    pub x1: f64,
+    pub y0: f64,
+    pub y1: f64,
+    pub k: f64,
+    pub material: MaterialArc,
+}
+
+impl XyPlane {
+    const THICKNESS: f64 = 0.0001;
+
+    pub fn new(x0: f64, y0: f64, x1: f64, y1: f64, k: f64, material: MaterialArc) -> Self {
+        Self {
+            x0,
+            x1,
+            y0,
+            y1,
+            k,
+            material,
+        }
+    }
+}
+
+impl Hittable for XyPlane {
+    fn bounding_box(&self, start_time: f64, end_time: f64) -> Option<BoxedBoundingBoxType> {
+        Some(Arc::new(AABB::new(
+            Vec3::new(self.x0, self.y0, self.k - Self::THICKNESS),
+            Vec3::new(self.x1, self.y1, self.k + Self::THICKNESS),
+        )))
+    }
+
+    fn hit(&self, ray: &Ray, min: f64, max: f64) -> Option<HitRecord> {
+        let unit_ray = ray.direction.unit();
+        let p = Vec3::new(self.x0, self.y0, self.k);
+        let dir = p - ray.origin;
+        let u = Vec3::new(self.x1 - self.x0, 0.0, self.k);
+        let v = Vec3::new(0.0, self.y1 - self.y0, self.k);
+        let mut normal = u.cross(&v).unit();
+        if normal.dot(&dir) < 0.0 {
+            normal = -normal;
+        }
+
+        let perp = dir.dot(&normal) * dir;
+        let cos = unit_ray.dot(&normal);
+        let t = perp.length() / cos;
+
+        // if t < min || t > max {
+        //     return None;
+        // }
+
+        let hit = t * unit_ray + ray.origin;
+        if hit.x() < self.x0 || hit.x() > self.x1 || hit.y() < self.y0 || hit.y() > self.y1 {
+            None
+        } else {
+            Some(HitRecord::new(
+                t,
+                (hit.x() - self.x0) / (self.x1 - self.x0),
+                (hit.y() - self.y0) / (self.y1 - self.y0),
+                hit,
+                normal,
+                true,
+                &self.material,
+            ))
+        }
     }
 }

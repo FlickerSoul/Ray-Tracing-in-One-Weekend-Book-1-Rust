@@ -46,10 +46,11 @@ pub fn ray_color(ray: &Ray, world: &crate::WorldType, iter: u32) -> vec3::Color 
     }
 
     if let Some(record) = world.hit(&ray, 0.001, f64::INFINITY) {
+        let emitted = record.material.emit(record.u, record.v, &record.hit_point);
         if let Some((color, out_ray)) = record.material.scatter(&ray, &record) {
-            ray_color(&out_ray, world, iter - 1) * color
+            emitted + ray_color(&out_ray, world, iter - 1) * color
         } else {
-            vec3::Color::zero()
+            emitted
         }
     } else {
         background(&ray)

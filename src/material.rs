@@ -3,11 +3,14 @@ use crate::objects::HitRecord;
 use crate::ray::Ray;
 use crate::texture::{SolidTexture, WrappedTextureType};
 use crate::utils::random;
-use crate::vec3::{Color, Vec3};
+use crate::vec3::{Color, Point3, Vec3};
 use std::sync::Arc;
 
 pub trait Material {
     fn scatter(&self, ray: &Ray, record: &HitRecord) -> Option<(Color, Ray)>;
+    fn emit(&self, _u: f64, _v: f64, _p: &Point3) -> Color {
+        Color::zero()
+    }
 }
 
 pub struct Lambertian {
@@ -114,5 +117,31 @@ impl Material for Dielectric {
             attenuation,
             Ray::with_timing(record.hit_point, refracted, ray.time),
         ));
+    }
+}
+
+pub struct DiffuseLight {
+    pub texture: WrappedTextureType,
+}
+
+impl DiffuseLight {
+    pub fn new(texture: WrappedTextureType) -> Self {
+        Self { texture }
+    }
+
+    pub fn with_color(color: Color) -> Self {
+        Self {
+            texture: Arc::new(SolidTexture::new(color)),
+        }
+    }
+}
+
+impl Material for DiffuseLight {
+    fn scatter(&self, ray: &Ray, record: &HitRecord) -> Option<(Color, Ray)> {
+        None
+    }
+
+    fn emit(&self, u: f64, v: f64, p: &Point3) -> Color {
+        self.texture.color_value(u, v, p)
     }
 }
