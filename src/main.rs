@@ -18,8 +18,8 @@ use std::thread;
 const ASPECT_RATIO: f64 = 1.0;
 const IMAGE_WIDTH: u32 = 600;
 const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
-const SAMPLES_PER_PIXEL: u32 = 200;
-const MAX_ITER: u32 = 50;
+const SAMPLES_PER_PIXEL: u32 = 50;
+const MAX_ITER: u32 = 120;
 
 pub type WorldElementType = Arc<dyn Hittable + Sync + Send>;
 pub type WorldType = Vec<WorldElementType>;

@@ -3,6 +3,7 @@ use crate::material::Material;
 use crate::math_traits::{CrossProduct, InnerProduct};
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
+use crate::WorldType;
 use std::marker::Sync;
 use std::sync::Arc;
 
@@ -447,5 +448,89 @@ impl Hittable for XzPlane {
                 &self.material,
             ))
         }
+    }
+}
+
+pub struct Box {
+    p0: Point3,
+    p1: Point3,
+    pub walls: WorldType,
+    pub material: MaterialArc,
+}
+
+impl Box {
+    pub fn new(p0: Point3, p1: Point3, material: MaterialArc) -> Self {
+        let mut walls = WorldType::new();
+
+        // front and back
+        walls.push(Arc::new(XyPlane::new(
+            p0.x(),
+            p1.x(),
+            p0.y(),
+            p1.y(),
+            p0.z(),
+            material.clone(),
+        )));
+        walls.push(Arc::new(XyPlane::new(
+            p0.x(),
+            p1.x(),
+            p0.y(),
+            p1.y(),
+            p1.z(),
+            material.clone(),
+        )));
+
+        // up and down
+        walls.push(Arc::new(XzPlane::new(
+            p0.x(),
+            p1.x(),
+            p0.z(),
+            p1.z(),
+            p0.y(),
+            material.clone(),
+        )));
+        walls.push(Arc::new(XzPlane::new(
+            p0.x(),
+            p1.x(),
+            p0.z(),
+            p1.z(),
+            p1.y(),
+            material.clone(),
+        )));
+
+        // left and right
+        walls.push(Arc::new(XyPlane::new(
+            p0.x(),
+            p1.x(),
+            p0.y(),
+            p1.y(),
+            p0.z(),
+            material.clone(),
+        )));
+        walls.push(Arc::new(XyPlane::new(
+            p0.x(),
+            p1.x(),
+            p0.y(),
+            p1.y(),
+            p1.z(),
+            material.clone(),
+        )));
+
+        Self {
+            p0,
+            p1,
+            walls,
+            material,
+        }
+    }
+}
+
+impl Hittable for Box {
+    fn hit(&self, ray: &Ray, min: f64, max: f64) -> Option<HitRecord> {
+        self.walls.hit(ray, min, max)
+    }
+
+    fn bounding_box(&self, start_time: f64, end_time: f64) -> Option<BoxedBoundingBoxType> {
+        Some(Arc::new(AABB::new(self.p0, self.p1)))
     }
 }
