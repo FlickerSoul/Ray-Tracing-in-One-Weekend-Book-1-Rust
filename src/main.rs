@@ -15,20 +15,20 @@ use objects::Hittable;
 use std::sync::Arc;
 use std::thread;
 
-const ASPECT_RATIO: f64 = 3.0 / 2.0;
-const IMAGE_WIDTH: u32 = 720;
+const ASPECT_RATIO: f64 = 1.0;
+const IMAGE_WIDTH: u32 = 600;
 const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
-const SAMPLES_PER_PIXEL: u32 = 100;
+const SAMPLES_PER_PIXEL: u32 = 200;
 const MAX_ITER: u32 = 50;
 
 pub type WorldElementType = Arc<dyn Hittable + Sync + Send>;
 pub type WorldType = Vec<WorldElementType>;
 
 fn make_camera() -> camera::Camera {
-    let from = vec3::Point3::new(6.0, 2.0, 6.0);
-    let at = vec3::Point3::new(0.0, 0.0, 0.0);
+    let from = vec3::Point3::new(278.0, 278.0, -800.0);
+    let at = vec3::Point3::new(278.0, 278.0, 0.0);
     let up = vec3::Vec3::new(0.0, 1.0, 0.0);
-    let fov = 20.0;
+    let fov = 40.0;
     let aperture = 0.1;
     let distance_to_focus = 10.0;
 
@@ -50,7 +50,7 @@ fn main() {
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
 
     let camera = Arc::new(make_camera());
-    let world = Arc::new(scene::simple_world());
+    let world = Arc::new(scene::cornell_world());
 
     for j in (0..IMAGE_HEIGHT).rev() {
         eprintln!("Output remaining {}", j + 1);

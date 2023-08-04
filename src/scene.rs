@@ -158,7 +158,78 @@ pub fn random_world() -> WorldType {
         1.0, 1.0, 1.0,
     )));
     world.push(Arc::new(objects::XyPlane::new(
-        -4.0, 0.0, -2.0, 2.0, 2.0, light_mat,
+        -4.0, -2.0, 0.0, 2.0, 2.0, light_mat,
+    )));
+
+    world
+}
+
+pub fn cornell_world() -> WorldType {
+    let mut world = WorldType::new();
+
+    let red = Arc::new(material::Lambertian::with_color(vec3::Color::new(
+        0.65, 0.05, 0.05,
+    )));
+    let white = Arc::new(material::Lambertian::with_color(vec3::Color::new(
+        0.73, 0.73, 0.73,
+    )));
+    let green = Arc::new(material::Lambertian::with_color(vec3::Color::new(
+        0.12, 0.45, 0.15,
+    )));
+    let light = Arc::new(material::DiffuseLight::with_color(vec3::Color::new(
+        15.0, 15.0, 15.0,
+    )));
+
+    world.push(Arc::new(objects::YzPlane::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        green.clone(),
+    )));
+    world.push(Arc::new(objects::YzPlane::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+        red.clone(),
+    )));
+
+    world.push(Arc::new(objects::XzPlane::new(
+        213.0,
+        343.0,
+        227.0,
+        332.0,
+        554.0,
+        light.clone(),
+    )));
+
+    world.push(Arc::new(objects::XzPlane::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+        white.clone(),
+    )));
+    world.push(Arc::new(objects::XzPlane::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
+    )));
+
+    world.push(Arc::new(objects::XyPlane::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
     )));
 
     world

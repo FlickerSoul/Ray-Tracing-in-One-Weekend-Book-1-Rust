@@ -268,16 +268,63 @@ pub struct XyPlane {
     pub k: f64,
     pub material: MaterialArc,
 }
+pub struct XzPlane {
+    pub x0: f64,
+    pub x1: f64,
+    pub z0: f64,
+    pub z1: f64,
+    pub k: f64,
+    pub material: MaterialArc,
+}
+
+pub struct YzPlane {
+    pub y0: f64,
+    pub y1: f64,
+    pub z0: f64,
+    pub z1: f64,
+    pub k: f64,
+    pub material: MaterialArc,
+}
 
 impl XyPlane {
     const THICKNESS: f64 = 0.0001;
 
-    pub fn new(x0: f64, y0: f64, x1: f64, y1: f64, k: f64, material: MaterialArc) -> Self {
+    pub fn new(x0: f64, x1: f64, y0: f64, y1: f64, k: f64, material: MaterialArc) -> Self {
         Self {
             x0,
             x1,
             y0,
             y1,
+            k,
+            material,
+        }
+    }
+}
+
+impl YzPlane {
+    const THICKNESS: f64 = 0.0001;
+
+    pub fn new(y0: f64, y1: f64, z0: f64, z1: f64, k: f64, material: MaterialArc) -> Self {
+        Self {
+            z0,
+            z1,
+            y0,
+            y1,
+            k,
+            material,
+        }
+    }
+}
+
+impl XzPlane {
+    const THICKNESS: f64 = 0.0001;
+
+    pub fn new(x0: f64, x1: f64, z0: f64, z1: f64, k: f64, material: MaterialArc) -> Self {
+        Self {
+            x0,
+            x1,
+            z0,
+            z1,
             k,
             material,
         }
@@ -315,6 +362,85 @@ impl Hittable for XyPlane {
                 t,
                 (hit.x() - self.x0) / (self.x1 - self.x0),
                 (hit.y() - self.y0) / (self.y1 - self.y0),
+                hit,
+                normal,
+                front_facing,
+                &self.material,
+            ))
+        }
+    }
+}
+impl Hittable for YzPlane {
+    fn bounding_box(&self, start_time: f64, end_time: f64) -> Option<BoxedBoundingBoxType> {
+        Some(Arc::new(AABB::new(
+            Vec3::new(self.k - Self::THICKNESS, self.y0, self.z0),
+            Vec3::new(self.k + Self::THICKNESS, self.y1, self.z1),
+        )))
+    }
+
+    fn hit(&self, ray: &Ray, min: f64, max: f64) -> Option<HitRecord> {
+        let t = (self.k - ray.origin.x()) / ray.direction.x();
+        if t < min || t > max {
+            return None;
+        }
+
+        let mut normal = Vec3::new(1.0, 0.0, 0.0);
+        let front_facing = if normal.dot(&ray.direction) < 0.0 {
+            true
+        } else {
+            normal = -normal;
+            false
+        };
+
+        let hit = ray.at(t);
+
+        if hit.y() < self.y0 || hit.y() > self.y1 || hit.z() < self.z0 || hit.z() > self.z1 {
+            None
+        } else {
+            Some(HitRecord::new(
+                t,
+                (hit.y() - self.y0) / (self.y1 - self.y0),
+                (hit.z() - self.z0) / (self.z1 - self.z0),
+                hit,
+                normal,
+                front_facing,
+                &self.material,
+            ))
+        }
+    }
+}
+
+impl Hittable for XzPlane {
+    fn bounding_box(&self, start_time: f64, end_time: f64) -> Option<BoxedBoundingBoxType> {
+        Some(Arc::new(AABB::new(
+            Vec3::new(self.x0, self.k - Self::THICKNESS, self.z0),
+            Vec3::new(self.x1, self.k + Self::THICKNESS, self.z1),
+        )))
+    }
+
+    fn hit(&self, ray: &Ray, min: f64, max: f64) -> Option<HitRecord> {
+        let t = (self.k - ray.origin.y()) / ray.direction.y();
+        if t < min || t > max {
+            return None;
+        }
+
+        let mut normal = Vec3::new(0.0, 1.0, 0.0);
+        let front_facing = if normal.dot(&ray.direction) < 0.0 {
+            true
+        } else {
+            normal = -normal;
+            false
+        };
+
+        let hit = ray.at(t);
+
+        if hit.x() < self.x0 || hit.x() > self.x1 || hit.z() < self.z0 || hit.z() > self.z1 {
+            None
+        } else {
+            Some(HitRecord::new(
+                t,
+                (hit.x() - self.x0) / (self.x1 - self.x0),
+                (hit.z() - self.z0) / (self.z1 - self.z0),
                 hit,
                 normal,
                 front_facing,
